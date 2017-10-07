@@ -21,9 +21,6 @@ using namespace boost;
 using namespace boost::assign;
 using namespace json_spirit;
 
-
-
-
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, Object& out, bool fIncludeHex)
 {
     txnouttype type;
