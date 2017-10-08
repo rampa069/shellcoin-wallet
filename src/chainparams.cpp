@@ -93,7 +93,11 @@ public:
         //base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x04)(0x88)(0xB2)(0x1E);
         //base58Prefixes[EXT_SECRET_KEY] = list_of(0x04)(0x88)(0xAD)(0xE4);
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x88)(0xAD)(0xE4).convert_to_container<std::vector<unsigned char> >();
+
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
+
+        //vSeeds.push_back(CDNSSeedData("explorer.shellcoin.org", "node0.shellcoin.org"));
+
 
         nLastPOWBlock = 2000;
     }
