@@ -1,10 +1,10 @@
 TEMPLATE = app
 TARGET = shell-qt
-VERSION = 1.0.0.0-rampa
+VERSION = 1.0.0.1-rampa
 INCLUDEPATH += src src/json src/qt src/qt/plugins/mrichtexteditor
 QT += network printsupport
 DEFINES += ENABLE_WALLET
-DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
+linux:DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
 CONFIG += no_include_pwd
 CONFIG += thread
 
@@ -79,7 +79,7 @@ contains(USE_UPNP, -) {
     DEFINES += USE_UPNP=$$USE_UPNP MINIUPNP_STATICLIB STATICLIB
     INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
     LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
-    win32:LIBS += -liphlpapi
+    win32:LIBS += -liphlpapi -lshlwapi -lstdc++ 
 }
 
 # use: qmake "USE_DBUS=1" or qmake "USE_DBUS=0"
@@ -101,7 +101,9 @@ contains(BITCOIN_NEED_QT_PLUGINS, 1) {
 QMAKE_CXXFLAGS *= -DUSE_SECP256K1
 
 INCLUDEPATH += src/leveldb/include src/leveldb/helpers
-LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
+linux:LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
+win32:LIBS += $$PWD/src/leveldb/libleveldb.a 
+win32:LIBS += -lshlwapi -lstdc++ 
 SOURCES += src/txdb-leveldb.cpp
 !win32 {
     # we use QMAKE_CXXFLAGS_RELEASE even without RELEASE=1 because we use RELEASE to indicate linking preferences not -O preferences
@@ -461,8 +463,8 @@ isEmpty(BOOST_LIB_SUFFIX) {
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
     BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
-    #win32:BOOST_THREAD_LIB_SUFFIX = _win32$$BOOST_LIB_SUFFIX
-    #else:BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
+    win32:BOOST_THREAD_LIB_SUFFIX = _win32$$BOOST_LIB_SUFFIX
+     else:BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
 }
 
 isEmpty(BDB_LIB_PATH) {
@@ -490,7 +492,7 @@ windows:RC_FILE = src/qt/res/bitcoin-qt.rc
 
 windows:!contains(MINGW_THREAD_BUGFIX, 0) {
     # At least qmake's win32-g++-cross profile is missing the -lmingwthrd
-    # thread-safety flag. GCC has -mthreads to enable this, but it doesn't
+    # thread-safety flag. GCC has -,threads to enable this, but it doesn't
     # work with static linking. -lmingwthrd must come BEFORE -lmingw, so
     # it is prepended to QMAKE_LIBS_QT_ENTRY.
     # It can be turned off with MINGW_THREAD_BUGFIX=0, just in case it causes
@@ -515,7 +517,7 @@ INCLUDEPATH += $$SECP256K1_INCLUDE_PATH $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH 
 LIBS += $$join(SECP256K1_LIB_PATH,,-L,) $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
 LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
 # -lgdi32 has to happen after -lcrypto (see  #681)
-windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
+windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32 -pthread
 LIBS += -lsecp256k1
 LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
 windows:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
